@@ -56,6 +56,20 @@
 			<version>1.1</version>
 		</dependency>
 
+		<!-- https://mvnrepository.com/artifact/org.json/json -->
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>20200518</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.everit.json/org.everit.json.schema -->
+		<dependency>
+			<groupId>org.everit.json</groupId>
+			<artifactId>org.everit.json.schema</artifactId>
+			<version>1.5.1</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>

@@ -1,5 +1,6 @@
-package com.example.restservice;
+package com.example.restservice.jsonUtils;
 
+import com.example.restservice.JedisClient;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.fge.jackson.JsonLoader;
