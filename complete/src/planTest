@@ -19,7 +19,7 @@
         "_org": "example.com",
         "copay": 0,
         "objectId": "1234512xvc1314asdfs-503",
-        "objectType": "membercostshare"
+        "objectType": "planservice_membercostshare"
       },
       "_org": "example.com",
       "objectId": "27283xvx9asdff-504",
@@ -37,7 +37,7 @@
         "_org": "example.com",
         "copay": 175,
         "objectId": "1234512xvc1314sdfsd-506",
-        "objectType": "membercostshare"
+        "objectType": "planservice_membercostshare"
       },
       "_org": "example.com",
       "objectId": "27283xvx9sdf-507",

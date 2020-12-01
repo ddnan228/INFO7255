@@ -2,12 +2,14 @@ package com.example.restservice;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
-// import javax.servlet.http.HttpServletResponse;
 
 import com.example.restservice.authClient.AuthClient;
 import com.example.restservice.etagUtils.EtagCacheStore;
 import com.example.restservice.jsonUtils.JsonMapService;
 import com.example.restservice.jsonUtils.JsonValidator;
+import com.example.restservice.queueIndex.PlanMessage;
+import com.example.restservice.queueIndex.QueueClient;
+import com.example.restservice.storeService.JedisClient;
 import org.json.JSONObject;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -16,11 +18,6 @@ import org.springframework.http.ResponseEntity;
 
 import org.springframework.web.bind.annotation.*;
 import redis.clients.jedis.Jedis;
-// import org.json.simple.JSONObject;
-// import java.io.IOException;
-// import com.github.fge.jsonschema.core.exceptions.ProcessingException;
-
-// import org.springframework.web.filter.ShallowEtagHeaderFilter;
 
 @RestController
 public class GreetingController {
@@ -100,6 +97,9 @@ public class GreetingController {
 				jedis.connect();
 				jedis.set(key, body);
 
+				PlanMessage indexMessage = new PlanMessage(key, false, body);
+				QueueClient.pushToQueue(indexMessage);
+
 				HttpHeaders headers = new HttpHeaders();
 				headers.setContentType(MediaType.APPLICATION_JSON);
 				String etag = etagCacheStore.putInAndGenerateEtage(key, body);
@@ -154,6 +154,10 @@ public class GreetingController {
 					System.out.println("put key-value.");
 					jedis.connect();
 					jedis.set(id, body);
+
+					PlanMessage indexMessage = new PlanMessage(id, false, body);
+					QueueClient.pushToQueue(indexMessage);
+
 					// set new Etag
 					String newEtag = etagCacheStore.putInAndGenerateEtage(id, body);
 					headers.setETag(newEtag);
@@ -205,6 +209,10 @@ public class GreetingController {
 					jedis.connect();
 					String patchedPlan = JsonMapService.patchJson(plan, body);
 					jedis.set(id, patchedPlan);
+
+					PlanMessage indexMessage = new PlanMessage(id, false, patchedPlan);
+					QueueClient.pushToQueue(indexMessage);
+
 					// set new Etag
 					String newEtag = etagCacheStore.putInAndGenerateEtage(id, patchedPlan);
 					headers.setETag(newEtag);
@@ -233,7 +241,12 @@ public class GreetingController {
 		jedis.connect();
 		boolean existed = jedis.exists(id);
 		if(existed) {
+			String jsonBody = jedis.get(id);
 			jedis.del(id);
+
+			PlanMessage indexMessage = new PlanMessage(id, true, jsonBody);
+			QueueClient.pushToQueue(indexMessage);
+
 			etagCacheStore.removePlanFromCacheByKey(id);
 			return new ResponseEntity<>("Plan with key " + id + " has been deleted.", HttpStatus.ACCEPTED);
 		}

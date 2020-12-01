@@ -1,14 +1,13 @@
 package com.example.restservice;
 
+import com.example.restservice.queueIndex.ElasticClient;
+import com.example.restservice.storeService.JedisClient;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.web.filter.ShallowEtagHeaderFilter;
 import redis.clients.jedis.Jedis;
 
 
@@ -18,6 +17,7 @@ public class RestServiceApplication {
     public static void main(String[] args) {
         SpringApplication.run(RestServiceApplication.class, args);
         new RestServiceApplication().setSchemaToJedis();
+        new ElasticClient().startIndexingEngine();
     }
 /*
     @Bean
