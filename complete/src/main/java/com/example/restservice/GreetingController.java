@@ -95,6 +95,11 @@ public class GreetingController {
 				String key = json.get("objectId").toString();
 				System.out.println("Create key-value.");
 				jedis.connect();
+
+				if(jedis.exists(key)) {
+					return new ResponseEntity<>("Plan id is duplicated, please change another objectId", HttpStatus.BAD_REQUEST);
+				}
+
 				jedis.set(key, body);
 
 				PlanMessage indexMessage = new PlanMessage(key, false, body);
@@ -155,6 +160,10 @@ public class GreetingController {
 					jedis.connect();
 					jedis.set(id, body);
 
+					// delete previous plan
+					PlanMessage deleteMessage = new PlanMessage(id, true, plan);
+					QueueClient.pushToQueue(deleteMessage);
+					// push new plan body into queue
 					PlanMessage indexMessage = new PlanMessage(id, false, body);
 					QueueClient.pushToQueue(indexMessage);
 
@@ -209,6 +218,12 @@ public class GreetingController {
 					jedis.connect();
 					String patchedPlan = JsonMapService.patchJson(plan, body);
 					jedis.set(id, patchedPlan);
+
+					// delete previous plan
+					PlanMessage deleteMessage = new PlanMessage(id, true, plan);
+					QueueClient.pushToQueue(deleteMessage);
+					
+					// push new plan body into queue
 
 					PlanMessage indexMessage = new PlanMessage(id, false, patchedPlan);
 					QueueClient.pushToQueue(indexMessage);

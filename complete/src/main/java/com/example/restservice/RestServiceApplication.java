@@ -10,6 +10,13 @@ import java.nio.file.Paths;
 
 import redis.clients.jedis.Jedis;
 
+/*
+* start redis server:    $redis-server
+* start elastic search:  bin/elasticsearch
+* start Kibana:  bin/kibana
+* elastic search console: http://localhost:5601/app/dev_tools#/console
+* */
+
 
 @SpringBootApplication
 public class RestServiceApplication {
